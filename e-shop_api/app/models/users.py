@@ -36,14 +36,14 @@ class Users(Base):
         return result
 
     @staticmethod
-    async def get_user_by_login(conn, login):
+    async def get_user_by_login(conn, login) -> 'Users':
         Session = sessionmaker(bind=conn)
         session = Session()
         result = session.query(Users).filter_by(login=login).first()
         return result
 
     @staticmethod
-    async def create_user(conn, name, login, password):
+    async def create_user(conn, name, login, password) -> int:
         Session = sessionmaker(bind=conn)
         session = Session()
         user = Users(name=name, login=login, password=generate_password_hash(password))
@@ -61,3 +61,4 @@ class Users(Base):
             return 'Invalid password'
         else:
             return None
+
