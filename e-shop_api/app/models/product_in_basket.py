@@ -13,13 +13,11 @@ class ProductInBasket(Base):
     product_shop = relationship("ProductShop", back_populates="product_in_basket")
     quantity = sa.Column('quantity', sa.Integer, default=1)
 
-
     def __repr__(self):
-        return "<product_shop('%s','%s', '%s', '%s', '%s')>" % (self.id,
-                                                                self.product_id,
-                                                                self.shop_id,
-                                                                self.price,
-                                                                self.quantity)
+        return "<ProductInBasket('%s','%s', '%s', '%s')>" % (self.id,
+                                                             self.basket_id,
+                                                             self.product_shop_id,
+                                                             self.quantity)
 
     @classmethod
     def from_json(cls, data):
