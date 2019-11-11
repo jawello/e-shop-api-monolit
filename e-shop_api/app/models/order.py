@@ -12,8 +12,8 @@ class Order(Base):
     basket_id = sa.Column(sa.Integer, sa.ForeignKey("basket.id"))
     basket = relationship("Basket", back_populates="order")
     date = sa.Column(sa.DateTime)
-    #status = sa.Column(sa.String)
-    #order_status = relationship("OrderStatus", back_populates="order")
+    status = sa.Column(sa.String, sa.ForeignKey("order_status.id"))
+    order_status = relationship("OrderStatus", back_populates="order")
 
     def __repr__(self):
         return "<order('%s','%s', '%s', '%s', '%s')>" % (self.id, self.user_id, self.basket_id, self.date, self.status)

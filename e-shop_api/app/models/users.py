@@ -16,7 +16,7 @@ class Users(Base):
     password = Column(String)
 
     def __repr__(self):
-        return "<User('%s','%s', '%s')>" % (self.name, self.login, self.password)
+        return "<users('%s','%s', '%s')>" % (self.name, self.login, self.password)
 
     @classmethod
     def from_json(cls, data):
