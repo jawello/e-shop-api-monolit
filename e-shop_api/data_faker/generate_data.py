@@ -2,6 +2,7 @@ from app.models import Users
 from app.models import Product
 from app.models import Shop
 from app.models import ProductShop
+from app.models import Basket
 
 from faker import Faker
 
@@ -73,9 +74,7 @@ def generate_product_shop(session: Session, count: int, products: list, shops: l
         product = products[random.randint(0, len(products) - 1)]
         price = round(random.uniform(5, 4000), 2)
         quantity = random.randint(0, 1000)
-        product_shop = ProductShop(price=price, quantity=quantity)
-        product_shop.product = product
-        product_shop.shop = shop
+        product_shop = ProductShop(product=product, shop=shop, price=price, quantity=quantity)
         try:
             session.add(product_shop)
             session.commit()
@@ -86,6 +85,21 @@ def generate_product_shop(session: Session, count: int, products: list, shops: l
         result.append(product_shop)
     for i in result:
         session.refresh(i)
+    return result
+
+
+def generate_basket(session: Session, count: int, users: list) -> list:
+    result = []
+    for i in range(count):
+        user = users[random.randint(0, len(users) - 1)]
+        basket = Basket(users=user)
+        session.add(basket)
+
+        result.append(basket)
+    session.commit()
+    for i in result:
+        session.refresh(i)
+        log.info(f"Generate product_shop: {i}")
     return result
 
 
@@ -101,6 +115,7 @@ def main(config_path):
     products = generate_products(session, 100)
     shops = generate_shop(session, 10)
     products_shops = generate_product_shop(session, 100, products, shops)
+    baskets = generate_basket(session, 100, users)
 
 
 if __name__ == '__main__':
