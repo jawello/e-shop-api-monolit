@@ -1,14 +1,15 @@
 from sqlalchemy import Column, String, Integer
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 from app.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import sessionmaker
-
-Base = declarative_base()
+from models import Base
 
 
 class Users(Base):
-    __tablename__ = 'uua'
+    __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
+    basket = relationship("Basket", back_populates="users")
+    order = relationship("Order", back_populates="users")
     name = Column(String)
     login = Column(String)
     password = Column(String)
