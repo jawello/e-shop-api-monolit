@@ -16,7 +16,8 @@ class UserEndpoint(AioHTTPRestEndpoint):
             '/user'
         ]
 
-    async def get(self, request: Request) -> Response:
+    @staticmethod
+    async def get(request: Request) -> Response:
         login = await authorized_userid(request)
         if not login:
             return respond_with_json({"error": "Unauthorized"}, status=401)
