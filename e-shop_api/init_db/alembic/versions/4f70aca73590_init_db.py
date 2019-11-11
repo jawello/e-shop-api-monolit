@@ -50,10 +50,11 @@ def upgrade():
 
     op.create_table('product_in_basket',
                     sa.Column('id', sa.Integer, primary_key=True),
-                    sa.Column('basket_id', sa.Integer, sa.ForeignKey('basket.id'), nullable=False, unique=True),
+                    sa.Column('basket_id', sa.Integer, sa.ForeignKey('basket.id'), nullable=False),
                     sa.Column('product_shop_id', sa.Integer, sa.ForeignKey('product_shop.id'), nullable=True),
                     sa.Column('quantity', sa.Integer, default=1)
                     )
+    op.create_unique_constraint('uq_product_in_basket', 'product_in_basket', ['basket_id', 'product_shop_id'])
     op.create_check_constraint('ck_quantity_basket', 'product_in_basket', 'quantity > 0')
 
     order_status = op.create_table('order_status',
@@ -63,14 +64,13 @@ def upgrade():
         [
             {"id": "check availability"},
             {"id": "awaiting payment"},
-            {"id": "paid"},
+            {"id": "paid"}
         ]
     )
 
     op.create_table('order',
                     sa.Column('id', sa.Integer, primary_key=True),
-                    sa.Column('users_id', sa.Integer, sa.ForeignKey('users.id'), nullable=False),
-                    sa.Column('basket_id', sa.Integer, nullable=False, unique=True),
+                    sa.Column('basket_id', sa.Integer, sa.ForeignKey('basket.id'), nullable=False, unique=True),
                     sa.Column('date', sa.DateTime, nullable=False),
                     sa.Column('status', sa.String, sa.ForeignKey('order_status.id'), nullable=False)
                     )
@@ -80,6 +80,7 @@ def downgrade():
     op.drop_table('order')
     op.drop_table('order_status')
 
+    op.drop_constraint('uq_product_in_basket', 'product_in_basket')
     op.drop_constraint('ck_quantity_basket', 'product_in_basket')
     op.drop_table('product_in_basket')
     op.drop_table('basket')
