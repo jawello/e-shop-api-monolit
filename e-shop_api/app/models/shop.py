@@ -13,7 +13,7 @@ class Shop(Base):
     site = sa.Column('site', sa.String)
 
     def __repr__(self):
-        return "<shop('%s','%s', '%s', '%s')>" % (self.id, self.name, self.description, self.site)
+        return "<Shop('%s','%s', '%s', '%s')>" % (self.id, self.name, self.description, self.site)
 
     @classmethod
     def from_json(cls, data):

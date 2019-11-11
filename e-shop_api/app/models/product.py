@@ -12,7 +12,7 @@ class Product(Base):
     description = sa.Column('description', sa.String)
 
     def __repr__(self):
-        return "<order('%s','%s', '%s')>" % (self.id, self.name, self.description)
+        return "<Product('%s','%s', '%s')>" % (self.id, self.name, self.description)
 
     @classmethod
     def from_json(cls, data):
