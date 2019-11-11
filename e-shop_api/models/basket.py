@@ -18,7 +18,7 @@ class Basket(Base):
         return cls(**data)
 
     def to_json(self):
-        to_serialize = ['name', 'login']
+        to_serialize = ['order', 'users']
         d = {}
         for attr_name in to_serialize:
             d[attr_name] = getattr(self, attr_name)
