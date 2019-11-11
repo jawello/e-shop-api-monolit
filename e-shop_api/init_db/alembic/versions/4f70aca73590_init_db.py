@@ -39,8 +39,7 @@ def upgrade():
                     sa.Column('product_id', sa.Integer, sa.ForeignKey('product.id'), nullable=False),
                     sa.Column('shop_id', sa.Integer, sa.ForeignKey('shop.id'), nullable=False),
                     sa.Column('price', sa.Float),
-                    sa.Column('quantity', sa.Integer),
-                    sa.UniqueConstraint('product_id', 'shop_id', name='uix_product_shop'))
+                    sa.Column('quantity', sa.Integer))
     op.create_unique_constraint('uq_product_shop', 'product_shop', ['product_id', 'shop_id'])
     op.create_check_constraint('ck_quantity_shop', 'product_shop', 'quantity > -1')
 
