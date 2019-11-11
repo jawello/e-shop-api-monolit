@@ -120,8 +120,8 @@ def generate_product_in_basket(session: Session, baskets: list, products_shops: 
             product_was.add(product_shop.id)
             if product_shop.quantity == 1:
                 quantity = 1
-            else:
-                quantity = random.randint(1, product_shop.quantity)
+            elif product_shop.quantity >= 10:
+                quantity = random.randint(1, 10)
             product_in_basket = ProductInBasket(basket=basket,
                                                 product_shop=product_shop,
                                                 quantity=quantity
