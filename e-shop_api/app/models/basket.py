@@ -13,7 +13,7 @@ class Basket(Base):
     users = relationship("Users", back_populates="basket")
 
     def __repr__(self):
-        return "<basket('%s','%s')>" % (self.id, self.user_id)
+        return "<Basket('%s','%s')>" % (self.id, self.users_id)
 
     @classmethod
     def from_json(cls, data):
