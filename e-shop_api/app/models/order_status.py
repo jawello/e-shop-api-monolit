@@ -10,7 +10,7 @@ class OrderStatus(Base):
     order = relationship("Order", back_populates="order_status")
 
     def __repr__(self):
-        return "<order_status('%s')>" % (self.id)
+        return "<OrderStatus('%s')>" % (self.id)
 
     @classmethod
     def from_json(cls, data):
