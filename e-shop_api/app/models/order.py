@@ -21,7 +21,7 @@ class Order(Base):
         return cls(**data)
 
     def to_json(self):
-        to_serialize = ['basket', 'date', 'status']
+        to_serialize = ['basket_id', 'date', 'status']
         d = {}
         for attr_name in to_serialize:
             d[attr_name] = getattr(self, attr_name)
