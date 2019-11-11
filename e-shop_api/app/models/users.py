@@ -10,7 +10,6 @@ class Users(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     basket = relationship("Basket", back_populates="users")
-    order = relationship("Order", back_populates="users")
     name = Column(String)
     login = Column(String)
     password = Column(String)
