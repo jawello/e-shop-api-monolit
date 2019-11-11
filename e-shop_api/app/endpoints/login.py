@@ -1,14 +1,12 @@
 from typing import List
 
-from aiohttp.web_response import Response
 from aiohttp.web import Request
-
+from aiohttp.web_response import Response
 from aiohttp_rest_api import AioHTTPRestEndpoint
 from aiohttp_rest_api.responses import respond_with_json
-
 from aiohttp_security import remember, authorized_userid
 
-from models.users import Users
+from app.models import Users
 
 
 class LoginEndpoint(AioHTTPRestEndpoint):

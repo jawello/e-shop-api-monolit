@@ -1,6 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
-from models import Base
+
+from app.models import Base
 
 
 class Basket(Base):
