@@ -10,7 +10,7 @@ class Basket(Base):
     order = relationship("Order", back_populates="basket", uselist=False)
     product_in_basket = relationship("ProductInBasket", back_populates="basket")
     users_id = sa.Column(sa.Integer, sa.ForeignKey("users.id"))
-    users = relationship("Users", back_populates="basket")
+    users = relationship("Users", back_populates="basket", uselist=False)
 
     def __repr__(self):
         return "<Basket('%s','%s')>" % (self.id, self.users_id)
