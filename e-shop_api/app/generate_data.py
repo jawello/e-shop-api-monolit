@@ -173,7 +173,7 @@ def main(config_path):
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    users = generate_users(session, 100)
+    users = generate_users(session, 10)
     products = generate_products(session, 100)
     shops = generate_shop(session, 10)
     products_shops = generate_product_shop(session, 200, products, shops)
