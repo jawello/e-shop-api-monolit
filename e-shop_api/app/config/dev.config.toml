@@ -12,3 +12,4 @@ REDIS_PORT = 6379
 
 [app]
 loglevel='DEBUG'
+port=8080
