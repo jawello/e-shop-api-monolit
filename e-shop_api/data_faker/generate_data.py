@@ -24,11 +24,11 @@ log = logging.getLogger(__name__)
 
 def generate_users(session: Session, count: int) -> list:
     faker = Faker('ru_RU')
-    default_pass = 'skytrack'
+    default_pass = generate_password_hash('skytrack')
     result = []
     for i in range(count):
         fake = faker.simple_profile(sex=None)
-        user = Users(name=fake['name'], login=fake['username'], password=generate_password_hash(default_pass))
+        user = Users(name=fake['name'], login=fake['username'], password=default_pass)
         result.append(user)
         log.info(f"Generate user: {user}")
         session.add(user)
@@ -94,8 +94,17 @@ def generate_product_shop(session: Session, count: int, products: list, shops: l
 
 def generate_basket(session: Session, count: int, users: list) -> list:
     result = []
+    user_was = set()
     for i in range(count):
-        user = users[random.randint(0, len(users) - 1)]
+        j = 0
+        while j < count:
+            user = users[random.randint(0, len(users) - 1)]
+            if user not in user_was:
+                user_was.add(user)
+                break
+            j = j+1
+        if j >= count:
+            break
         basket = Basket(users=user)
         session.add(basket)
 
@@ -164,13 +173,13 @@ def main(config_path):
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    users = generate_users(session, 10)
+    users = generate_users(session, 100)
     products = generate_products(session, 100)
     shops = generate_shop(session, 10)
-    products_shops = generate_product_shop(session, 100, products, shops)
-    baskets = generate_basket(session, 100, users)
+    products_shops = generate_product_shop(session, 200, products, shops)
+    baskets = generate_basket(session, 50, users)
     generate_product_in_basket(session, baskets, products_shops)
-    generate_order(session, 50, baskets)
+    generate_order(session, 30, baskets)
 
 
 if __name__ == '__main__':
