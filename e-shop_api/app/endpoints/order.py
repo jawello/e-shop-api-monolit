@@ -12,7 +12,7 @@ from app.models import Users
 class OrderEndpoint(AioHTTPRestEndpoint):
     def connected_routes(self) -> List[str]:
         return [
-            '/order'
+            '/orders'
         ]
 
     @staticmethod
