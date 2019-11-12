@@ -10,10 +10,10 @@ class ProductShop(Base):
     product_in_basket = relationship("ProductInBasket", back_populates="product_shop")
 
     product_id = sa.Column('product_id', sa.Integer, sa.ForeignKey('product.id'), nullable=False)
-    product = relationship("Product", back_populates="product_shop")
+    product = relationship("Product", back_populates="product_shop", uselist=False)
 
     shop_id = sa.Column('shop_id', sa.Integer, sa.ForeignKey('shop.id'), nullable=False)
-    shop = relationship("Shop", back_populates="product_shop")
+    shop = relationship("Shop", back_populates="product_shop", uselist=False)
 
     price = sa.Column('price', sa.Float)
 
