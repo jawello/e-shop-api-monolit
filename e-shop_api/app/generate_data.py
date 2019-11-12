@@ -46,8 +46,8 @@ def generate_products(session: Session, count: int) -> list:
         description = faker.texts(nb_texts=3, max_nb_chars=200)
         product = Product(name=name, description=description)
         result.append(product)
-        log.info(f"Generate product: {product}")
         session.add(product)
+        log.debug(f"Generate product: {product}")
     session.commit()
     for i in result:
         session.refresh(i)
@@ -63,8 +63,8 @@ def generate_shop(session: Session, count: int) -> list:
         site = faker.domain_name()
         shop = Shop(name=name, description=description, site=site)
         result.append(shop)
-        log.info(f"Generate shop: {shop}")
         session.add(shop)
+        log.debug(f"Generate shop: {shop}")
     session.commit()
     for i in result:
         session.refresh(i)
@@ -85,7 +85,7 @@ def generate_product_shop(session: Session, count: int, products: list, shops: l
         except:
             session.rollback()
             continue
-        log.info(f"Generate product_shop: {product_shop}")
+        log.debug(f"Generate product_shop: {product_shop}")
         result.append(product_shop)
     for i in result:
         session.refresh(i)
@@ -94,17 +94,10 @@ def generate_product_shop(session: Session, count: int, products: list, shops: l
 
 def generate_basket(session: Session, count: int, users: list) -> list:
     result = []
-    user_was = set()
     for i in range(count):
-        j = 0
-        while j < count:
-            user = users[random.randint(0, len(users) - 1)]
-            if user not in user_was:
-                user_was.add(user)
-                break
-            j = j+1
-        if j >= count:
-            break
+
+        user = users[random.randint(0, len(users) - 1)]
+
         basket = Basket(users=user)
         session.add(basket)
 
@@ -112,7 +105,7 @@ def generate_basket(session: Session, count: int, users: list) -> list:
     session.commit()
     for i in result:
         session.refresh(i)
-        log.info(f"Generate basket: {i}")
+        log.debug(f"Generate basket: {i}")
     return result
 
 
@@ -141,33 +134,29 @@ def generate_product_in_basket(session: Session, baskets: list, products_shops: 
     session.commit()
     for i in result:
         session.refresh(i)
-        log.info(f"Generate product_in_basket: {i}")
+        log.debug(f"Generate product_in_basket: {i}")
 
 
-def generate_order(session: Session, count: int, baskets: list):
+def generate_order(session: Session, users: list):
     result = []
     statuses = ["check availability", "awaiting payment", "paid"]
-    faker = Faker()
-    basket_was = set()
-    for i in range(count):
-        while True:
-            basket = baskets[random.randint(0, len(baskets) - 1)]
-            if basket not in basket_was:
-                basket_was.add(basket)
-                break
-        status = statuses[random.randint(0, len(statuses) - 1)]
-        order = Order(basket=basket, status=status, date=faker.date_time_this_year())
-        session.add(order)
-        result.append(order)
-    session.commit()
+    faker = Faker('ru_RU')
+    for user in users:
+        for basket in user.basket:
+            status = statuses[random.randint(0, len(statuses) - 1)]
+            order = Order(basket=basket, status=status, date=faker.date_time_this_year())
+            session.add(order)
+            result.append(order)
+        session.commit()
     for i in result:
         session.refresh(i)
-        log.info(f"Generate order: {i}")
+        log.debug(f"Generate order: {i}")
 
 
 def main(config_path):
     config = load_config(config_path)
-    logging.basicConfig(level=logging.INFO)
+    log_level = logging.getLevelName(config['app']['loglevel'])
+    logging.basicConfig(level=log_level)
     db_url = construct_db_url(config['database'])
     engine = create_engine(db_url)
     Session = sessionmaker(bind=engine)
@@ -179,7 +168,7 @@ def main(config_path):
     products_shops = generate_product_shop(session, 200, products, shops)
     baskets = generate_basket(session, 50, users)
     generate_product_in_basket(session, baskets, products_shops)
-    generate_order(session, 30, baskets)
+    generate_order(session, users)
 
 
 if __name__ == '__main__':
