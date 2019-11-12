@@ -21,10 +21,10 @@ class ProductShop(Base):
 
     def __repr__(self):
         return "<ProductShop('%s','%s', '%s', '%s', '%s')>" % (self.id,
-                                                                self.product_id,
-                                                                self.shop_id,
-                                                                self.price,
-                                                                self.quantity)
+                                                               self.product_id,
+                                                               self.shop_id,
+                                                               self.price,
+                                                               self.quantity)
 
     @classmethod
     def from_json(cls, data):
@@ -36,4 +36,3 @@ class ProductShop(Base):
         for attr_name in to_serialize:
             d[attr_name] = getattr(self, attr_name)
         return d
-
