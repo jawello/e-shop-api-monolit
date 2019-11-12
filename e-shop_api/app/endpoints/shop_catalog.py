@@ -35,5 +35,5 @@ class ShopCatalogEndpoint(AioHTTPRestEndpoint):
             result.append({"name": product_shop.product.name, "description": product_shop.product.description,
                            "price": product_shop.price, "quantity": product_shop.quantity})
 
-        return respond_with_json(result)
+        return respond_with_json({"catalog": result})
 
