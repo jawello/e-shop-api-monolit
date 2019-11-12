@@ -5,9 +5,9 @@ from aiohttp_security import setup as setup_security
 from aiohttp_session import setup as setup_session
 from aiohttp_session.redis_storage import RedisStorage
 import aioredis
-from app.db_auth import DBAuthorizationPolicy
-from app.db import init_db
-from app.settings import load_config
+from db_auth import DBAuthorizationPolicy
+from db import init_db
+from settings import load_config
 from aiohttp_rest_api.loader import load_and_connect_all_endpoints_from_folder, get_swagger_documentation
 import logging
 
@@ -27,7 +27,7 @@ async def setup_redis(app):
         pool.close()
         await pool.wait_closed()
 
-    app.on_cleanup.append(close_redis)
+    on_cleanup.append(close_redis)
     app['redis_pool'] = pool
     return pool
 

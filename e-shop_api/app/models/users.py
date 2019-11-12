@@ -2,8 +2,8 @@ from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
 
-from app.models import Base
-from app.security import generate_password_hash, check_password_hash
+from models import Base
+from security import generate_password_hash, check_password_hash
 
 
 class Users(Base):

@@ -1,7 +1,7 @@
 from aiohttp_security.abc import AbstractAuthorizationPolicy
 from sqlalchemy.engine import Engine
 
-from app.models import Users
+from models import Users
 
 
 class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
