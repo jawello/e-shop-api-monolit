@@ -1,6 +1,18 @@
 FROM python:3.7-alpine
 MAINTAINER jawello, jawello@gmail.com
 
-COPY . /e-shop_app
+RUN apk update \
+  && apk add --virtual build-deps autoconf automake g++ make build-deps gcc python3-dev musl-dev \
+  && apk add postgresql-dev \
+  && pip install --no-cache-dir psycopg2-binary Faker SQLAlchemy pytoml py-bcrypt\
+  && apk del build-deps gcc
 
-ENTRYPOINT ["python", "main.py", "-c config/config.toml"]
+COPY . /app
+
+VOLUME ["/config"]
+
+WORKDIR /app
+
+#ENTRYPOINT ["python", "main.py", "-c config/config.toml"]
+ENTRYPOINT ["python", "generate_data.py", "-c", "/config/config.toml"]
+
