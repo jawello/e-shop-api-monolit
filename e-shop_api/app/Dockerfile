@@ -14,6 +14,6 @@ VOLUME ["/config/config.toml"]
 
 WORKDIR /app
 
-ENTRYPOINT ["python", "main.py", "-c", "config/config.toml"]
+ENTRYPOINT ["python", "main.py", "-c", "/config/config.toml"]
 #ENTRYPOINT ["python", "generate_data.py", "-c", "/config/config.toml"]
 
