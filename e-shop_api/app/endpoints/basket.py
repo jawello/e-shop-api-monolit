@@ -13,6 +13,10 @@ from models import ProductInBasket
 
 from sqlalchemy.orm import sessionmaker
 
+import logging
+
+log = logging.getLogger(__name__)
+
 
 class BasketEndpoint(AioHTTPRestEndpoint):
     def connected_routes(self) -> List[str]:
@@ -28,7 +32,9 @@ class BasketEndpoint(AioHTTPRestEndpoint):
                 return respond_with_json({"error": "Unauthorized"}, status=401)
             else:
                 conn = request.app['db_pool']
-                user = await Users.get_user_by_login(conn,
+                Session = sessionmaker(bind=conn)
+                session = Session()
+                user = await Users.get_user_by_login(session,
                                                      login=login
                                                      )
             if not user:
@@ -36,9 +42,6 @@ class BasketEndpoint(AioHTTPRestEndpoint):
 
             data = await request.json()
             if data:
-                Session = sessionmaker(bind=conn)
-                session = Session()
-
                 basket = session.query(Basket).filter_by(users=user).first()
                 if not basket:
                     basket = Basket(users=user)
@@ -52,11 +55,13 @@ class BasketEndpoint(AioHTTPRestEndpoint):
                     session.commit()
                 except Exception as ex:
                     session.rollback()
-                    return respond_with_json({"error": str(ex)}, status=400)
+                    log.warning(f"Endpoint: basket, Method: put. Msg:{str(ex)}")
+                    return respond_with_json({"error": "Internal Server Error"}, status=500)
 
                 return respond_with_json({"msg": "Products add successfully"})
             else:
                 return respond_with_json({"error": "No parameters"}, status=400)
         except Exception as ex:
-            return respond_with_json({"error": str(ex)}, status=400)
+            log.warning(f"Endpoint: basket, Method: put. Msg:{str(ex)}")
+            return respond_with_json({"error": "Internal Server Error"}, status=500)
 

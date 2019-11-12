@@ -8,6 +8,12 @@ from aiohttp_security import remember, authorized_userid
 
 from models import Users
 
+from sqlalchemy.orm import sessionmaker
+
+import logging
+
+log = logging.getLogger(__name__)
+
 
 class LoginEndpoint(AioHTTPRestEndpoint):
     def connected_routes(self) -> List[str]:
@@ -23,11 +29,14 @@ class LoginEndpoint(AioHTTPRestEndpoint):
         try:
             data = await request.json()
             if data:
-                error = await Users.validate_user_login(request.app['db_pool'], data['login'], data['password'])
+                conn = request.app['db_pool']
+                Session = sessionmaker(bind=conn)
+                session = Session()
+                error = Users.validate_user_login(session, data['login'], data['password'])
                 if not error:
-                    user = await Users.get_user_by_login(request.app['db_pool'],
-                                                         login=data['login']
-                                                         )
+                    user = Users.get_user_by_login(session,
+                                                   login=data['login']
+                                                   )
                     response = respond_with_json({"msg": "login success"})
                     await remember(request, response, user.login)
                     return response
@@ -36,4 +45,5 @@ class LoginEndpoint(AioHTTPRestEndpoint):
             else:
                 return respond_with_json({"error": "No parameters"})
         except Exception as ex:
-            return respond_with_json({"error": str(ex)})
+            log.warning(f"Endpoint: login, Method: post. Error:{str(ex)}")
+            return respond_with_json({"error": "Internal Server Error"}, status=500)

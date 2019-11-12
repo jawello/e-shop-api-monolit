@@ -28,9 +28,7 @@ class Shop(Base):
         return d
 
     @staticmethod
-    async def get_shop_by_id(conn, shop_id) -> 'Shop':
-        Session = sessionmaker(bind=conn)
-        session = Session()
+    def get_shop_by_id(session, shop_id) -> 'Shop':
         result = session.query(Shop).filter_by(id=shop_id).first()
         return result
 

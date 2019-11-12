@@ -29,31 +29,25 @@ class Users(Base):
         return d
 
     @staticmethod
-    async def get_user_by_id(conn, user_id) -> 'Users':
-        Session = sessionmaker(bind=conn)
-        session = Session()
+    def get_user_by_id(session, user_id) -> 'Users':
         result = session.query(Users).filter_by(id=user_id).first()
         return result
 
     @staticmethod
-    async def get_user_by_login(conn, login) -> 'Users':
-        Session = sessionmaker(bind=conn)
-        session = Session()
+    def get_user_by_login(session, login) -> 'Users':
         result = session.query(Users).filter_by(login=login).first()
         return result
 
     @staticmethod
-    async def create_user(conn, name, login, password) -> int:
-        Session = sessionmaker(bind=conn)
-        session = Session()
+    def create_user(session, name, login, password) -> int:
         user = Users(name=name, login=login, password=generate_password_hash(password))
         session.add(user)
         session.commit()
         return user.id
 
     @staticmethod
-    async def validate_user_login(conn, login, password):
-        user = await Users.get_user_by_login(conn, login)
+    def validate_user_login(session, login, password):
+        user = Users.get_user_by_login(session, login)
 
         if not user:
             return 'Invalid username'
