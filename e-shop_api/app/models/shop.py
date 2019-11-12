@@ -2,7 +2,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
 
-from app.models import Base
+from models import Base
 
 
 class Shop(Base):

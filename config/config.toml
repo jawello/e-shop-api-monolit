@@ -1,0 +1,15 @@
+[database]
+DB_HOST = 'postgres'
+DB_PORT = 5432
+
+DB_NAME = 'postgres'
+DB_USER = 'postgres'
+DB_PASS = 'skytrack'
+
+[redis]
+
+REDIS_HOST = 'redis'
+REDIS_PORT = 6379
+
+[app]
+loglevel='INFO'

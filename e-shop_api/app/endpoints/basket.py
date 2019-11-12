@@ -6,10 +6,10 @@ from aiohttp_rest_api import AioHTTPRestEndpoint
 from aiohttp_rest_api.responses import respond_with_json
 from aiohttp_security import authorized_userid
 
-from app.models import Basket
-from app.models import Users
-from app.models import ProductShop
-from app.models import ProductInBasket
+from models import Basket
+from models import Users
+from models import ProductShop
+from models import ProductInBasket
 
 from sqlalchemy.orm import sessionmaker
 

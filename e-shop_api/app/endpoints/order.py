@@ -7,7 +7,7 @@ from aiohttp_rest_api import AioHTTPRestEndpoint
 from aiohttp_rest_api.responses import respond_with_json
 from aiohttp_security import authorized_userid
 
-from app.models import Users
+from models import Users
 
 
 class OrderEndpoint(AioHTTPRestEndpoint):
