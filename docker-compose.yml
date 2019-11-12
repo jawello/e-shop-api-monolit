@@ -1,0 +1,42 @@
+version: "3"
+services:
+  redis:
+    image: redis:5-alpine
+    expose:
+      - 6379
+    networks:
+      - app
+    restart: on-failure
+  postgres:
+    image: postgres:latest
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    networks:
+      - app
+    environment:
+      - POSTGRES_PASSWORD=skytrack
+    restart: on-failure
+  init_db:
+    build:
+      context: ./e-shop_api/init_db
+    volumes:
+      - ${PWD}/config/alembic.ini:/migration/alembic.ini
+    networks:
+      - app
+    depends_on:
+      - build_init_db_image
+      - postgres
+  data_faker:
+    build:
+      context: ./e-shop_api/app
+      dockerfile: Dockerfile_generate_data
+    networks:
+      - app
+    volumes:
+      - ${PWD}/config/config.toml:/config/config.toml
+    depends_on:
+      - init_db
+networks:
+  app:
