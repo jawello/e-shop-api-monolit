@@ -1,5 +1,5 @@
 [database]
-DB_HOST = 'localhost'
+DB_HOST = 'postgres'
 DB_PORT = 5432
 
 DB_NAME = 'postgres'
@@ -8,5 +8,5 @@ DB_PASS = 'skytrack'
 
 [redis]
 
-REDIS_HOST = 'localhost'
+REDIS_HOST = 'resdis'
 REDIS_PORT = 6379
