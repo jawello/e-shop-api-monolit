@@ -1,4 +1,5 @@
 from typing import List
+from datetime import datetime
 
 from aiohttp.web import Request
 from aiohttp.web_response import Response
@@ -32,7 +33,7 @@ class OrderEndpoint(AioHTTPRestEndpoint):
         for basket in user.basket:
             if basket.order:
                 order = {"status": basket.order.status,
-                         "date": basket.order.date}
+                         "date": basket.order.date.isoformat()}
                 products = []
                 for product_in_basket in basket.product_in_basket:
                     product = {"name": product_in_basket.product_shop.product.name,
