@@ -12,7 +12,7 @@ services:
     expose:
       - 5432
     ports:
-      - 5432:5432
+      - "5432:5432"
     networks:
       - app
     environment:
@@ -26,7 +26,6 @@ services:
     networks:
       - app
     depends_on:
-      - build_init_db_image
       - postgres
   data_faker:
     build:
@@ -38,5 +37,18 @@ services:
       - ${PWD}/config/config.toml:/config/config.toml
     depends_on:
       - init_db
+  e-shop_api:
+    build:
+      context: ./e-shop_api/app
+      dockerfile: Dockerfile
+    ports:
+      - "80:8080"
+    networks:
+      - app
+    volumes:
+      - ${PWD}/config/config.toml:/config/config.toml
+    depends_on:
+      - postgres
+      - redis
 networks:
   app:
