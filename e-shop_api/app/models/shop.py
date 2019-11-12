@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import sessionmaker
 
 from app.models import Base
 
@@ -25,4 +26,11 @@ class Shop(Base):
         for attr_name in to_serialize:
             d[attr_name] = getattr(self, attr_name)
         return d
+
+    @staticmethod
+    async def get_shop_by_id(conn, shop_id) -> 'Shop':
+        Session = sessionmaker(bind=conn)
+        session = Session()
+        result = session.query(Shop).filter_by(id=shop_id).first()
+        return result
 
