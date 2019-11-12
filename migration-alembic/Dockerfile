@@ -10,5 +10,3 @@ RUN apk update \
 COPY . /migration-alembic
 
 WORKDIR /migration-alembic
-
-ENTRYPOINT ["alembic", "upgrade", "head"]

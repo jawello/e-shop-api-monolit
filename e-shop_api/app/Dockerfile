@@ -10,7 +10,7 @@ RUN apk update \
 
 COPY . /app
 
-VOLUME ["/config"]
+VOLUME ["/config/config.toml"]
 
 WORKDIR /app
 
