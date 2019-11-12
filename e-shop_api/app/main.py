@@ -27,7 +27,7 @@ async def setup_redis(app):
         pool.close()
         await pool.wait_closed()
 
-    on_cleanup.append(close_redis)
+    app.on_cleanup.append(close_redis)
     app['redis_pool'] = pool
     return pool
 
