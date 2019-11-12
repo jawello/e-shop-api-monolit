@@ -8,5 +8,8 @@ DB_PASS = 'skytrack'
 
 [redis]
 
-REDIS_HOST = 'resdis'
+REDIS_HOST = 'redis'
 REDIS_PORT = 6379
+
+[app]
+loglevel='WARNING'
