@@ -9,7 +9,7 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
         self.db_pool = db_pool
 
     async def authorized_userid(self, identity):
-        user = Users.get_user_by_login(self.db_pool, identity)
+        user = await Users.get_user_by_login(self.db_pool, identity)
         if user:
             return identity
         return None
