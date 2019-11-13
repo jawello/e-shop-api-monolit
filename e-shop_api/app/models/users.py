@@ -54,7 +54,7 @@ class Users(Base):
 
     @staticmethod
     def validate_user_login(session, login, password):
-        user = Users.get_user_by_login(session, login)
+        user = Users.get_user_by_login_sync(session, login)
 
         if not user:
             return 'Invalid username'
