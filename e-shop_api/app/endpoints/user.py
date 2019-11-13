@@ -32,14 +32,14 @@ class UserEndpoint(AioHTTPRestEndpoint):
             Session = sessionmaker(bind=conn)
             session = Session()
 
-            user = Users.get_user_by_login(session,
+            user = Users.get_user_by_login_sync(session,
                                            login=login
                                            )
             if user:
                 return respond_with_json(user.to_json())
             else:
                 return respond_with_json({"error": F"No user with login {login}"}, status=404)
-        except:
+        except Exception as ex:
             log.warning(f"Endpoint: user, Method: get. Error:{str(ex)}")
             return respond_with_json({"error": "Internal Server Error"}, status=500)
 

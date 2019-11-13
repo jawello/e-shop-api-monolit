@@ -34,7 +34,7 @@ class LoginEndpoint(AioHTTPRestEndpoint):
                 session = Session()
                 error = Users.validate_user_login(session, data['login'], data['password'])
                 if not error:
-                    user = Users.get_user_by_login(session,
+                    user = Users.get_user_by_login_sync(session,
                                                    login=data['login']
                                                    )
                     response = respond_with_json({"msg": "login success"})

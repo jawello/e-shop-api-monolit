@@ -8,6 +8,8 @@ from aiohttp_security import authorized_userid
 
 from models import Shop
 
+from sqlalchemy.orm import sessionmaker
+
 import logging
 
 log = logging.getLogger(__name__)
@@ -31,11 +33,13 @@ class ShopCatalogEndpoint(AioHTTPRestEndpoint):
             if not shop_id:
                 return respond_with_json({"error": "No shop id in request"}, status=400)
 
-            db_pool = request.app['db_pool']
+            conn = request.app['db_pool']
+            Session = sessionmaker(bind=conn)
+            session = Session()
 
             result = []
 
-            shop = await Shop.get_shop_by_id(db_pool, shop_id)
+            shop = Shop.get_shop_by_id(session, shop_id)
             for product_shop in shop.product_shop:
                 result.append({"name": product_shop.product.name, "description": product_shop.product.description,
                                "price": product_shop.price, "quantity": product_shop.quantity})

@@ -32,7 +32,7 @@ class OrderEndpoint(AioHTTPRestEndpoint):
             conn = request.app['db_pool']
             Session = sessionmaker(bind=conn)
             session = Session()
-            user = Users.get_user_by_login(session,
+            user = Users.get_user_by_login_sync(session,
                                            login=login
                                            )
             if not user:

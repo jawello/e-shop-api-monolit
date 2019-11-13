@@ -34,7 +34,14 @@ class Users(Base):
         return result
 
     @staticmethod
-    def get_user_by_login(session, login) -> 'Users':
+    async def get_user_by_login(conn, login) -> 'Users':
+        Session = sessionmaker(bind=conn)
+        session = Session()
+        result = session.query(Users).filter_by(login=login).first()
+        return result
+
+    @staticmethod
+    def get_user_by_login_sync(session, login) -> 'Users':
         result = session.query(Users).filter_by(login=login).first()
         return result
 

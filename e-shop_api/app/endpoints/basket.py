@@ -34,15 +34,15 @@ class BasketEndpoint(AioHTTPRestEndpoint):
                 conn = request.app['db_pool']
                 Session = sessionmaker(bind=conn)
                 session = Session()
-                user = await Users.get_user_by_login(session,
-                                                     login=login
-                                                     )
+                user = Users.get_user_by_login_sync(session,
+                                                    login=login
+                                                    )
             if not user:
                 return respond_with_json({"error": F"No user with login {login}"}, status=404)
 
             data = await request.json()
             if data:
-                basket = session.query(Basket).filter_by(users=user).first()
+                basket = session.query(Basket).filter_by(users=user).filter_by(order=None).first()
                 if not basket:
                     basket = Basket(users=user)
 
@@ -64,4 +64,3 @@ class BasketEndpoint(AioHTTPRestEndpoint):
         except Exception as ex:
             log.warning(f"Endpoint: basket, Method: put. Msg:{str(ex)}")
             return respond_with_json({"error": "Internal Server Error"}, status=500)
-
