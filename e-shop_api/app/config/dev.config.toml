@@ -7,6 +7,9 @@ DB_USER = 'postgres'
 DB_PASS = 'skytrack'
 
 [redis]
-
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
+
+[app]
+loglevel='DEBUG'
+port=8080

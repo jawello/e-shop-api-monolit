@@ -5,9 +5,9 @@ from aiohttp_security import setup as setup_security
 from aiohttp_session import setup as setup_session
 from aiohttp_session.redis_storage import RedisStorage
 import aioredis
-from app.db_auth import DBAuthorizationPolicy
-from app.db import init_db
-from app.settings import load_config
+from db_auth import DBAuthorizationPolicy
+from db import init_db
+from settings import load_config
 from aiohttp_rest_api.loader import load_and_connect_all_endpoints_from_folder, get_swagger_documentation
 import logging
 
@@ -38,7 +38,6 @@ async def init_app(config)-> Application:
     app['config'] = config
 
     load_and_connect_all_endpoints_from_folder(
-        # path='{0}/{1}'.format(os.path.dirname(os.path.realpath(__file__)), 'endpoints'),
         path='endpoints',
         app=app,
         version_prefix='v1'
@@ -64,7 +63,11 @@ def main(config_path):
     config = load_config(config_path)
     logging.basicConfig(level=logging.DEBUG)
     app = init_app(config)
-    web.run_app(app)
+    app_config = config.get('app', None)
+    if not app_config:
+        web.run_app(app, port=app_config.get('port', 8080))
+    else:
+        web.run_app(app, port=8080)
 
 
 if __name__ == '__main__':

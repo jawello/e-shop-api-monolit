@@ -6,12 +6,16 @@ from aiohttp_rest_api import AioHTTPRestEndpoint
 from aiohttp_rest_api.responses import respond_with_json
 from aiohttp_security import authorized_userid
 
-from app.models import Basket
-from app.models import Users
-from app.models import ProductShop
-from app.models import ProductInBasket
+from models import Basket
+from models import Users
+from models import ProductShop
+from models import ProductInBasket
 
 from sqlalchemy.orm import sessionmaker
+
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class BasketEndpoint(AioHTTPRestEndpoint):
@@ -28,18 +32,17 @@ class BasketEndpoint(AioHTTPRestEndpoint):
                 return respond_with_json({"error": "Unauthorized"}, status=401)
             else:
                 conn = request.app['db_pool']
-                user = await Users.get_user_by_login(conn,
-                                                     login=login
-                                                     )
+                Session = sessionmaker(bind=conn)
+                session = Session()
+                user = Users.get_user_by_login_sync(session,
+                                                    login=login
+                                                    )
             if not user:
                 return respond_with_json({"error": F"No user with login {login}"}, status=404)
 
             data = await request.json()
             if data:
-                Session = sessionmaker(bind=conn)
-                session = Session()
-
-                basket = session.query(Basket).filter_by(users=user).first()
+                basket = session.query(Basket).filter_by(users=user).filter_by(order=None).first()
                 if not basket:
                     basket = Basket(users=user)
 
@@ -52,11 +55,12 @@ class BasketEndpoint(AioHTTPRestEndpoint):
                     session.commit()
                 except Exception as ex:
                     session.rollback()
-                    return respond_with_json({"error": str(ex)}, status=400)
+                    log.warning(f"Endpoint: basket, Method: put. Msg:{str(ex)}")
+                    return respond_with_json({"error": "Internal Server Error"}, status=500)
 
                 return respond_with_json({"msg": "Products add successfully"})
             else:
                 return respond_with_json({"error": "No parameters"}, status=400)
         except Exception as ex:
-            return respond_with_json({"error": str(ex)}, status=400)
-
+            log.warning(f"Endpoint: basket, Method: put. Msg:{str(ex)}")
+            return respond_with_json({"error": "Internal Server Error"}, status=500)

@@ -2,7 +2,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
 
-from app.models import Base
+from models import Base
 
 
 class Shop(Base):
@@ -28,9 +28,7 @@ class Shop(Base):
         return d
 
     @staticmethod
-    async def get_shop_by_id(conn, shop_id) -> 'Shop':
-        Session = sessionmaker(bind=conn)
-        session = Session()
+    def get_shop_by_id(session, shop_id) -> 'Shop':
         result = session.query(Shop).filter_by(id=shop_id).first()
         return result
 

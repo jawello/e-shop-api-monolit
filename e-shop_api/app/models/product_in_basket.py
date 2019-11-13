@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 
-from app.models import Base
+from models import Base
 
 
 class ProductInBasket(Base):
