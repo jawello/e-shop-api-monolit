@@ -125,7 +125,7 @@ paths:
                   value:
                     error: Internal Server Error
   /shop_catalog:
-    post:
+    get:
       description: Method return catalog by shop.
       parameters:
         - name: id
