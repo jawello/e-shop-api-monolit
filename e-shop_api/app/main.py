@@ -8,11 +8,8 @@ import aioredis
 from db_auth import DBAuthorizationPolicy
 from db import init_db
 from settings import load_config
-from aiohttp_rest_api.loader import load_and_connect_all_endpoints_from_folder, get_swagger_documentation
+from aiohttp_rest_api.loader import load_and_connect_all_endpoints_from_folder
 import logging
-
-# from aiohttp_rest_api.swagger import setup_swagger
-# setup_swagger(app, swagger_info=get_swagger_documentation())
 
 log = logging.getLogger(__name__)
 
