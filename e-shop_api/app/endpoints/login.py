@@ -43,7 +43,7 @@ class LoginEndpoint(AioHTTPRestEndpoint):
                 else:
                     return respond_with_json({"error": error}, status=401)
             else:
-                return respond_with_json({"error": "No parameters"})
+                return respond_with_json({"error": "No parameters"}, status=400)
         except Exception as ex:
             log.warning(f"Endpoint: login, Method: post. Error:{str(ex)}")
             return respond_with_json({"error": "Internal Server Error"}, status=500)
