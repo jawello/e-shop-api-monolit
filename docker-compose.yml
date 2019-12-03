@@ -18,6 +18,8 @@ services:
     environment:
       - POSTGRES_PASSWORD=skytrack
     restart: on-failure
+    logging:
+      driver: none
   init_db:
     build:
       context: ./e-shop_api/init_db
@@ -27,6 +29,7 @@ services:
       - app
     depends_on:
       - postgres
+    restart: on-failure
   data_faker:
     build:
       context: ./e-shop_api/app
@@ -37,6 +40,7 @@ services:
       - ${PWD}/config/config.toml:/config/config.toml
     depends_on:
       - init_db
+    restart: on-failure
   e-shop_api:
     build:
       context: ./e-shop_api/app
@@ -48,7 +52,7 @@ services:
     volumes:
       - ${PWD}/config/config.toml:/config/config.toml
     depends_on:
-      - postgres
+      - init_db
       - redis
 networks:
   app:
