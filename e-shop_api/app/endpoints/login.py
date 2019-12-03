@@ -37,13 +37,13 @@ class LoginEndpoint(AioHTTPRestEndpoint):
                     user = Users.get_user_by_login_sync(session,
                                                         login=data['login']
                                                         )
-                    response = respond_with_json({"msg": "login success"})
+                    response = respond_with_json({"status": "successful"})
                     await remember(request, response, user.login)
                     return response
                 else:
-                    return respond_with_json({"error": error}, status=401)
+                    return respond_with_json({"status": "unsuccessful", "error": error}, status=401)
             else:
-                return respond_with_json({"error": "No parameters"})
+                return respond_with_json({"error": "No parameters"}, status=400)
         except Exception as ex:
             log.warning(f"Endpoint: login, Method: post. Error:{str(ex)}")
             return respond_with_json({"error": "Internal Server Error"}, status=500)

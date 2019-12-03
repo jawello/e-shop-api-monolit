@@ -1,0 +1,226 @@
+openapi: 3.0.0
+info:
+  title: E-Shop API
+  description: E-Shop API is example service.
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080/v0.0.1
+paths:
+  /login:
+    post:
+      description: |
+        Method start user session. Returns a login status in body and session token in cookies AIOHTTP_SESSION
+      requestBody:
+        required: true
+        content:
+          applicataion/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                password:
+                  type: string
+            example:
+              name: susu12
+              password: skytrack
+      security: []
+      responses:
+        "200":
+          description: Successful login. Secret token was produced
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: AIOHTTP_SESSION=abcde12345; Path=/; HttpOnly
+          content:
+            application/json:
+              schema:
+                  type: object
+                  properties:
+                      status:
+                        type: string
+                        description: Login status
+              examples:
+                succes:
+                  summary: An example of a status
+                  value:
+                    status: successful
+        "401":
+          description: Unsuccessful login. Secret token was not produced
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error description
+              examples:
+                error:
+                  summary: An example of a error
+                  value:
+                    error: Bad parameters
+        "500":
+          description: Unsuccessful login. Secret token was not produced
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error description
+              examples:
+                error:
+                  summary: An example of a error
+                  value:
+                    error: Internal Server Error
+  /logout:
+    post:
+      description: Method end user session.
+      requestBody:
+        required: true
+        content:
+          applicataion/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                password:
+                  type: string
+            example:
+              name: susu12
+              password: skytrack
+      responses:
+        "200":
+          description: Successful logout.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Logout status
+              examples:
+                succes:
+                  summary: An example of a status
+                  value:
+                    status: successful
+        "500":
+          description: Unsuccessful logout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error description
+              examples:
+                error:
+                  summary: An example of a error
+                  value:
+                    error: Internal Server Error
+  /shop_catalog:
+    get:
+      description: Method return catalog by shop.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Shop id
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        "200":
+          description: Return shop catalog.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  catalog:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                    description: Product
+                    example:
+                      - name: I Robot
+                        description: Aizek Azimov
+                        price: 22.01
+                        quantity: 20
+                      - name: C++
+                        description: Shoot at the knee
+                        price: 1000.999999
+                        quantity: 1
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error description
+              examples:
+                error:
+                  summary: An example of a error
+                  value:
+                    error: Unauthorized
+        "400":
+          description: No shop id in request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error description
+              examples:
+                error:
+                  summary: An example of a error
+                  value:
+                    error: No shop id in request
+        "500":
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error description
+              examples:
+                error:
+                  summary: An example of a error
+                  value:
+                    error: Internal Server Error
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: AIOHTTP_SESSION
+  schemas:
+    Product:
+      type: object
+      description: Product.
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        quantity:
+          type: integer
+security:
+  - cookieAuth: []
