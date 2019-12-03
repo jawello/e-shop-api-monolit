@@ -21,7 +21,7 @@ class LoginEndpoint(AioHTTPRestEndpoint):
 
     async def post(self, request: Request) -> Response:
         try:
-            response = respond_with_json({"msg": "logout success"})
+            response = respond_with_json({"status": "successful"})
             await forget(request, response)
             return response
         except Exception as ex:

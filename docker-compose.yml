@@ -54,5 +54,15 @@ services:
     depends_on:
       - init_db
       - redis
+  swagger:
+    image: swaggerapi/swagger-ui:latest
+    networks:
+      - app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ${PWD}/e-shop_api/app/api.yaml:/foo/api.yaml
+    environment:
+      - SWAGGER_JSON=/foo/api.yaml
 networks:
   app:
