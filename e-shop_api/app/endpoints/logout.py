@@ -6,7 +6,7 @@ from aiohttp.web import Request
 from aiohttp_rest_api import AioHTTPRestEndpoint
 from aiohttp_rest_api.responses import respond_with_json
 
-from aiohttp_security import forget
+from aiohttp_security import forget, authorized_userid
 
 import logging
 
@@ -21,6 +21,9 @@ class LoginEndpoint(AioHTTPRestEndpoint):
 
     async def post(self, request: Request) -> Response:
         try:
+            user_id = await authorized_userid(request)
+            if not user_id:
+                return respond_with_json({"error": "Session invalid"}, status=400)
             response = respond_with_json({"status": "successful"})
             await forget(request, response)
             return response
