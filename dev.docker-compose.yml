@@ -1,0 +1,55 @@
+version: "3"
+services:
+  redis:
+    image: redis:5-alpine
+    ports:
+      - 6379:6379
+    networks:
+      - app
+    restart: on-failure
+  postgres:
+    image: postgres:latest
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+    networks:
+      - app
+    environment:
+      - POSTGRES_PASSWORD=skytrack
+    restart: on-failure
+    logging:
+      driver: none
+  init_db:
+    build:
+      context: ./e-shop_api/init_db
+    volumes:
+      - ${PWD}/config/alembic.ini:/migration/alembic.ini
+    networks:
+      - app
+    depends_on:
+      - postgres
+    restart: on-failure
+  data_faker:
+    build:
+      context: ./e-shop_api/app
+      dockerfile: Dockerfile_generate_data
+    networks:
+      - app
+    volumes:
+      - ${PWD}/config/config.toml:/config/config.toml
+    depends_on:
+      - init_db
+    restart: on-failure
+  swagger:
+    image: swaggerapi/swagger-ui:latest
+    networks:
+      - app
+    ports:
+      - 8083:8080
+    volumes:
+      - ${PWD}/e-shop_api/app/api.yaml:/foo/api.yaml
+    environment:
+      - SWAGGER_JSON=/foo/api.yaml
+networks:
+  app:
