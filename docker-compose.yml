@@ -7,6 +7,16 @@ services:
     networks:
       - app
     restart: on-failure
+  rabbitmq:
+    image: "rabbitmq:3.8.2-management-alpine"
+    hostname: "rabbit"
+    ports:
+      - 15672:15672
+    expose:
+      - 5672
+    environment:
+      - RABBITMQ_DEFAULT_USER=jawello
+      - RABBITMQ_DEFAULT_PASS=skytrack
   postgres:
     image: postgres:latest
     expose:
