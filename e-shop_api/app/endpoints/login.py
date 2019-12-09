@@ -35,11 +35,8 @@ class LoginEndpoint(AioHTTPRestEndpoint):
                 user_id = await authorized_userid(request)
                 if not error:
                     response = respond_with_json({"status": "successful"})
-                    if user_id:
-                        return response
-                    else:
-                        await remember(request, response, user.login)
-                        return response
+                    await remember(request, response, user.login)
+                    return response
                 else:
                     response = respond_with_json({"status": "unsuccessful", "error": error}, status=401)
                     if user_id:
