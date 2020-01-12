@@ -10,8 +10,10 @@ from models import Basket
 from models import Users
 from models import ProductShop
 from models import ProductInBasket
+from models import Shop
 
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session
 
 import logging
 
@@ -23,6 +25,30 @@ class BasketEndpoint(AioHTTPRestEndpoint):
         return [
             '/basket'
         ]
+
+    @staticmethod
+    def create_basket_dict(session: Session, user: Users) -> dict:
+        result = {}
+        baskets = session.query(Basket).filter_by(users=user).filter_by(order=None).all()
+        for basket in baskets:
+            result[basket.shop.id] = basket
+
+        return result
+
+    @staticmethod
+    def fill_basket(session: Session, basket_product_dict: dict, products: [], user: Users):
+        result = basket_product_dict
+        for product in products:
+            product_shop = session.query(ProductShop).filter_by(id=product['id']).first()
+            shop = session.query(ProductShop).filter_by(product_shop=product_shop).first()
+            if shop.id not in result:
+                result[shop.id] = Basket(users=user, shop=shop)
+
+            basket = result[shop.id]
+
+            product_in_basket = ProductInBasket(basket=basket, product_shop=product_shop,
+                                                quantity=product['quantity'])
+            session.add(product_in_basket)
 
     @staticmethod
     async def put(request: Request) -> Response:
@@ -42,16 +68,10 @@ class BasketEndpoint(AioHTTPRestEndpoint):
 
             data = await request.json()
             if data:
-                basket = session.query(Basket).filter_by(users=user).filter_by(order=None).first()
-                if not basket:
-                    basket = Basket(users=user)
+                baskets_shop_dict = BasketEndpoint.create_basket_dict(session, user)
 
                 try:
-                    for product in data["products"]:
-                        product_shop = session.query(ProductShop).filter_by(id=product['id']).first()
-                        product_in_basket = ProductInBasket(basket=basket, product_shop=product_shop,
-                                                            quantity=product['quantity'])
-                        session.add(product_in_basket)
+                    BasketEndpoint.fill_basket(session, baskets_shop_dict, data["products"], user)
                     session.commit()
                 except Exception as ex:
                     session.rollback()
@@ -64,3 +84,4 @@ class BasketEndpoint(AioHTTPRestEndpoint):
         except Exception as ex:
             log.warning(f"Endpoint: basket, Method: put. Msg:{str(ex)}")
             return respond_with_json({"error": "Internal Server Error"}, status=500)
+

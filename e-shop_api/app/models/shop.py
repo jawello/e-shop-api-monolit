@@ -9,6 +9,7 @@ class Shop(Base):
     __tablename__ = 'shop'
     id = sa.Column('id', sa.Integer, primary_key=True)
     product_shop = relationship("ProductShop", back_populates="shop")
+    basket = relationship("Basket", back_populates="shop", uselist=True)
     name = sa.Column('name', sa.String, nullable=False, unique=True)
     description = sa.Column('description', sa.String)
     site = sa.Column('site', sa.String)
