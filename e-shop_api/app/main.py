@@ -8,7 +8,7 @@ import aioredis
 from db_auth import DBAuthorizationPolicy
 from db import init_db
 from settings import load_config
-from aiohttp_rest_api.loader import load_and_connect_all_endpoints_from_folder
+from routes import setup_routes
 import logging
 
 log = logging.getLogger(__name__)
@@ -29,16 +29,12 @@ async def setup_redis(app):
     return pool
 
 
-async def init_app(config)-> Application:
+async def init_app(config) -> Application:
     app = web.Application()
 
     app['config'] = config
 
-    load_and_connect_all_endpoints_from_folder(
-        path='endpoints',
-        app=app,
-        version_prefix='v1'
-    )
+    setup_routes(app)
 
     db_pool = await init_db(app)
 
