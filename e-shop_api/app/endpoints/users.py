@@ -30,7 +30,7 @@ async def users_get(request: Request) -> Response:
                                             )
 
         if user:
-            return Response(body=json.dumps(user.to_json()))
+            return Response(body=json.dumps(user.to_json()))  # TODO: make with marshmallow
         else:
             return HTTPNotFound()
     except Exception as ex:
@@ -56,7 +56,7 @@ async def users_get(request: Request) -> Response:
             users_list.append(u.to_json())
 
         if users_list:
-            return Response(body=json.dumps(users_list))
+            return Response(body=json.dumps(users_list))  # TODO: make with marshmallow
         else:
             return HTTPNotFound()
     except Exception as ex:
@@ -72,7 +72,7 @@ async def users_post(request: Request) -> Response:
         conn = request.app['db_pool']
         session_maker = sessionmaker(bind=conn)
         session = session_maker()
-        if data:
+        if data: # TODO: make with marshmallow
             Users.create_user(session,
                               data.get('name'),
                               data['login'],
