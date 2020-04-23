@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
+from marshmallow import Schema, fields
 
 from models import Base
 from security import generate_password_hash, check_password_hash
@@ -16,17 +17,6 @@ class Users(Base):
 
     def __repr__(self):
         return "<Users('%s','%s', '%s')>" % (self.name, self.login, self.password)
-
-    @classmethod
-    def from_json(cls, data):
-        return cls(**data)
-
-    def to_json(self):
-        to_serialize = ['name', 'login']
-        d = {}
-        for attr_name in to_serialize:
-            d[attr_name] = getattr(self, attr_name)
-        return d
 
     @staticmethod
     def get_user_by_id(session, user_id) -> 'Users':
@@ -62,4 +52,13 @@ class Users(Base):
             return 'Invalid password'
         else:
             return None
+
+
+class UsersSchema(Schema):
+    id = fields.Integer()
+    name = fields.Str()
+    login = fields.Str()
+    password = fields.Str()
+    # TODO: nested Basket
+    # TODO: nested Shop
 
