@@ -1,6 +1,7 @@
 from endpoints.sessions import sessions_post, sessions_delete
 from endpoints.users import users_get, users_post
 from endpoints.shops import shops_get, shops_id_get, shops_post
+from endpoints.products import products_get
 from aiohttp.web import Application
 
 
@@ -16,3 +17,4 @@ def setup_routes(app: Application):
     app.router.add_get('/shops/{id}', shops_id_get, name='shop_info')
     app.router.add_post('/shops', shops_post, name='shop_create')
 
+    app.router.add_get('/products', products_get, name='products_list')
