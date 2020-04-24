@@ -16,14 +16,3 @@ class Order(Base):
     def __repr__(self):
         return "<Order('%s','%s', '%s', '%s')>" % (self.id, self.basket_id, self.date, self.status)
 
-    @classmethod
-    def from_json(cls, data):
-        return cls(**data)
-
-    def to_json(self):
-        to_serialize = ['basket_id', 'date', 'status']
-        d = {}
-        for attr_name in to_serialize:
-            d[attr_name] = getattr(self, attr_name)
-        return d
-

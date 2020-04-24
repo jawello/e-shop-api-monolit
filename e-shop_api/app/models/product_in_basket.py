@@ -19,13 +19,3 @@ class ProductInBasket(Base):
                                                              self.product_shop_id,
                                                              self.quantity)
 
-    @classmethod
-    def from_json(cls, data):
-        return cls(**data)
-
-    def to_json(self):
-        to_serialize = ['basket', 'users', 'date']
-        d = {}
-        for attr_name in to_serialize:
-            d[attr_name] = getattr(self, attr_name)
-        return d

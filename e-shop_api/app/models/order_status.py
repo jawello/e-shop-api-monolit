@@ -10,16 +10,5 @@ class OrderStatus(Base):
     order = relationship("Order", back_populates="order_status")
 
     def __repr__(self):
-        return "<OrderStatus('%s')>" % (self.id)
-
-    @classmethod
-    def from_json(cls, data):
-        return cls(**data)
-
-    def to_json(self):
-        to_serialize = ['name', 'description']
-        d = {}
-        for attr_name in to_serialize:
-            d[attr_name] = getattr(self, attr_name)
-        return d
+        return "<OrderStatus('%s')>" % self.id
 

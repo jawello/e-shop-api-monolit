@@ -3,7 +3,8 @@ from aiohttp.web_response import Response
 from aiohttp import web
 import json
 
-from models.shop import Shop, ShopScheme
+from models.shop import Shop
+from models.schemas.shop_schema import ShopSchema
 
 from sqlalchemy.orm import sessionmaker
 
@@ -24,9 +25,9 @@ async def shops_get(request: Request) -> Response:
         shops = session.query(Shop).all()
         if params:
             output = [x.strip() for x in params.split(',')]
-            shops_list = ShopScheme(many=True, only=output).dump(shops)
+            shops_list = ShopSchema(many=True, only=output).dump(shops)
         else:
-            shops_list = ShopScheme(many=True).dump(shops)
+            shops_list = ShopSchema(many=True).dump(shops)
         return Response(body=json.dumps(shops_list))
     except Exception as ex:
         log.warning(f"Endpoint: shops, Method: get. Error:{str(ex)}")
@@ -48,9 +49,9 @@ async def shops_id_get(request: Request) -> Response:
         params = request.rel_url.query.get('output')
         if params:
             output = [x.strip() for x in params.split(',')]
-            shops_serialized = ShopScheme(only=output).dump(shops)
+            shops_serialized = ShopSchema(only=output).dump(shops)
         else:
-            shops_serialized = ShopScheme().dump(shops)
+            shops_serialized = ShopSchema().dump(shops)
         return Response(body=json.dumps(shops_serialized))
     except Exception as ex:
         log.warning(f"Endpoint: shops, Method: get. Error:{str(ex)}")
@@ -66,7 +67,7 @@ async def shops_post(request: Request) -> Response:
         session_maker = sessionmaker(bind=conn)
         session = session_maker()
         if data:
-            shop_data = ShopScheme().load(data)
+            shop_data = ShopSchema().load(data)
             shop = Shop(**shop_data)
             session.add(shop)
             session.commit()

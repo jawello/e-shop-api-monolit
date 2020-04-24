@@ -14,14 +14,3 @@ class Product(Base):
     def __repr__(self):
         return "<Product('%s','%s', '%s')>" % (self.id, self.name, self.description)
 
-    @classmethod
-    def from_json(cls, data):
-        return cls(**data)
-
-    def to_json(self):
-        to_serialize = ['name', 'description']
-        d = {}
-        for attr_name in to_serialize:
-            d[attr_name] = getattr(self, attr_name)
-        return d
-

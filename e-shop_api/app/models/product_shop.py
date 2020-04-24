@@ -1,6 +1,5 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
-
 from models import Base
 
 
@@ -26,13 +25,3 @@ class ProductShop(Base):
                                                                self.price,
                                                                self.quantity)
 
-    @classmethod
-    def from_json(cls, data):
-        return cls(**data)
-
-    def to_json(self):
-        to_serialize = ['id', 'product_id', 'shop_id', 'price', 'quantity']
-        d = {}
-        for attr_name in to_serialize:
-            d[attr_name] = getattr(self, attr_name)
-        return d

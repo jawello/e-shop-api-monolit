@@ -10,7 +10,6 @@ from models import Basket
 from models import Users
 from models import ProductShop
 from models import ProductInBasket
-from models import Shop
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import Session

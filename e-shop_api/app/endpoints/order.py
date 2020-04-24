@@ -36,8 +36,8 @@ class OrderEndpoint(AioHTTPRestEndpoint):
             Session = sessionmaker(bind=conn)
             session = Session()
             user = Users.get_user_by_login_sync(session,
-                                           login=login
-                                           )
+                                                login=login
+                                                )
             if not user:
                 return respond_with_json({"error": F"No user with login {login}"}, status=404)
 
