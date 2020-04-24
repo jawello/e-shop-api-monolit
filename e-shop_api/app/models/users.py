@@ -1,19 +1,17 @@
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
-from marshmallow import Schema, fields
-
-from models import Base
 from security import generate_password_hash, check_password_hash
+from models import Base
 
 
 class Users(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    basket = relationship("Basket", back_populates="users")
     name = Column(String)
     login = Column(String)
     password = Column(String)
+    basket = relationship("Basket", back_populates="users")
 
     def __repr__(self):
         return "<Users('%s','%s', '%s')>" % (self.name, self.login, self.password)
@@ -52,13 +50,4 @@ class Users(Base):
             return 'Invalid password'
         else:
             return None
-
-
-class UsersSchema(Schema):
-    id = fields.Integer()
-    name = fields.Str()
-    login = fields.Str()
-    password = fields.Str()
-    # TODO: nested Basket
-    # TODO: nested Shop
 
