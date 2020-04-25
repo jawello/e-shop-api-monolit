@@ -67,14 +67,13 @@ async def shops_post(request: Request) -> Response:
         session_maker = sessionmaker(bind=conn)
         session = session_maker()
         if data:
-            shop_data = ShopSchema().load(data)
-            shop = Shop(**shop_data)
+            shop = ShopSchema().load(data, session=session)
             session.add(shop)
             session.commit()
             return Response(headers={'location': f"/shops/{shop.id}"})
         else:
             return HTTPBadRequest()
     except Exception as ex:
-        log.warning(f"Endpoint: /users, Method: post. Error:{str(ex)}")
+        log.warning(f"Endpoint: /shops, Method: post. Error:{str(ex)}")
         return HTTPInternalServerError()
 
