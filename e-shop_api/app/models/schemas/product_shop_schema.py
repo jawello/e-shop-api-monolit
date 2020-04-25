@@ -1,9 +1,10 @@
-from marshmallow import Schema
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from models.product_shop import ProductShop
 
 
-class ProductShopSchema(Schema):
+class ProductShopSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = ProductShop
         include_fk = True
         load_instance = True
+
