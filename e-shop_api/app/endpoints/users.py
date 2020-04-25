@@ -72,7 +72,7 @@ async def users_post(request: Request) -> Response:
         conn = request.app['db_pool']
         session_maker = sessionmaker(bind=conn)
         session = session_maker()
-        if data: # TODO: make with marshmallow
+        if data:  # TODO: make with marshmallow
             Users.create_user(session,
                               data.get('name'),
                               data['login'],
