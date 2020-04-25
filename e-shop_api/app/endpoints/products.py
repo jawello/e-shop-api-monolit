@@ -30,14 +30,14 @@ async def products_get(request: Request) -> Response:
         else:
             result = session.query(Product).all()
 
-        params = request.rel_url.query.get('output')
-        if params:
-            output = [x.strip() for x in params.split(',')]
+        output_params = request.rel_url.query.get('output')
+        if output_params:
+            output = [x.strip() for x in output_params.split(',')]
             products_serialized = ProductSchema(many=True, only=output).dump(result)
         else:
             products_serialized = ProductSchema(many=True).dump(result)
 
-        return Response(body=json.dumps(products_serialized))
+        return Response(body=json.dumps(products_serialized), headers={'content-type': 'application/json'})
     except Exception as ex:
         log.warning(f"Endpoint: products, Method: get. Error:{str(ex)}")
         return HTTPInternalServerError()
@@ -63,7 +63,7 @@ async def products_id_get(request: Request) -> Response:
         else:
             products_serialized = ProductSchema().dump(result)
 
-        return Response(body=json.dumps(products_serialized))
+        return Response(body=json.dumps(products_serialized), headers={'content-type': 'application/json'})
     except Exception as ex:
         log.warning(f"Endpoint: products/id, Method: get. Error:{str(ex)}")
         return HTTPInternalServerError()

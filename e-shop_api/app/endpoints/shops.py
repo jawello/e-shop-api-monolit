@@ -28,7 +28,7 @@ async def shops_get(request: Request) -> Response:
             shops_list = ShopSchema(many=True, only=output).dump(shops)
         else:
             shops_list = ShopSchema(many=True).dump(shops)
-        return Response(body=json.dumps(shops_list))
+        return Response(body=json.dumps(shops_list), headers={'content-type': 'application/json'})
     except Exception as ex:
         log.warning(f"Endpoint: shops, Method: get. Error:{str(ex)}")
         return HTTPInternalServerError()
@@ -52,7 +52,7 @@ async def shops_id_get(request: Request) -> Response:
             shops_serialized = ShopSchema(only=output).dump(shops)
         else:
             shops_serialized = ShopSchema().dump(shops)
-        return Response(body=json.dumps(shops_serialized))
+        return Response(body=json.dumps(shops_serialized), headers={'content-type': 'application/json'})
     except Exception as ex:
         log.warning(f"Endpoint: shops, Method: get. Error:{str(ex)}")
         return HTTPInternalServerError()
@@ -70,10 +70,12 @@ async def shops_post(request: Request) -> Response:
             shop = ShopSchema().load(data, session=session)
             session.add(shop)
             session.commit()
-            return Response(headers={'location': f"/shops/{shop.id}"})
+            return Response(headers={'location': f"/shops/{shop.id}", 'content-type': 'application/json'})
         else:
             return HTTPBadRequest()
     except Exception as ex:
         log.warning(f"Endpoint: /shops, Method: post. Error:{str(ex)}")
         return HTTPInternalServerError()
+
+# TODO: make post method to add product to shop
 

@@ -25,12 +25,14 @@ async def users_get(request: Request) -> Response:
         session_maker = sessionmaker(bind=conn)
         session = session_maker()
 
+        # TODO: make with marshmallow
         user = Users.get_user_by_login_sync(session,
                                             login=request.match_info['login']
                                             )
 
         if user:
-            return Response(body=json.dumps(user.to_json()))  # TODO: make with marshmallow
+            return Response(body=json.dumps(user.to_json()),
+                            headers={'content-type': 'application/json'})
         else:
             return HTTPNotFound()
     except Exception as ex:
@@ -49,6 +51,7 @@ async def users_get(request: Request) -> Response:
         session_maker = sessionmaker(bind=conn)
         session = session_maker()
 
+        # TODO: make with marshmallow
         users = session.query(Users)
 
         users_list = []
@@ -56,7 +59,8 @@ async def users_get(request: Request) -> Response:
             users_list.append(u.to_json())
 
         if users_list:
-            return Response(body=json.dumps(users_list))  # TODO: make with marshmallow
+            return Response(body=json.dumps(users_list),
+                            headers={'content-type': 'application/json'})
         else:
             return HTTPNotFound()
     except Exception as ex:
@@ -72,12 +76,13 @@ async def users_post(request: Request) -> Response:
         conn = request.app['db_pool']
         session_maker = sessionmaker(bind=conn)
         session = session_maker()
-        if data:  # TODO: make with marshmallow
-            Users.create_user(session,
+        # TODO: make with marshmallow
+        if data:
+            user_id = Users.create_user(session,
                               data.get('name'),
                               data['login'],
                               data['password'])
-            return Response()
+            return Response(headers={'location': f"/users/{user_id}"})
         else:
             return HTTPBadRequest()
     except Exception as ex:
