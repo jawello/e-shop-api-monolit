@@ -1,4 +1,4 @@
-from aiohttp.web import Request, HTTPInternalServerError, HTTPBadRequest
+from aiohttp.web import Request, HTTPInternalServerError, HTTPBadRequest, HTTPConflict
 from aiohttp.web_response import Response
 from aiohttp import web
 import json
@@ -77,13 +77,49 @@ async def products_post(request: Request) -> Response:
         conn = request.app['db_pool']
         session_maker = sessionmaker(bind=conn)
         session = session_maker()
+
         if data:
             product_shop_data = data.pop('product_shop', None)
             product = ProductSchema().load(data, session=session)
             session.add(product)
             session.commit()
 
+            if product_shop_data:
+                product_shop_data['product_id'] = product.id
+                product_shop = ProductShopSchema().load(product_shop_data, session=session)
+                session.add(product_shop)
+                session.commit()
+            return Response(headers={'location': f"/products/{product.id}"})
+        else:
+            return HTTPBadRequest()
+    except Exception as ex:
+        log.warning(f"Endpoint: /products, Method: post. Error:{str(ex)}")
+        return HTTPInternalServerError()
+
+
+@routes.post('/products/{id}/shops')
+async def products_shop_post(request: Request) -> Response:
+    try:
+        data = await request.json()
+
+        conn = request.app['db_pool']
+        session_maker = sessionmaker(bind=conn)
+        session = session_maker()
+
+        product_id = request.match_info['id']
+        if not product_id:
+            return HTTPBadRequest()
+
+        product = session.query(Product).filter_by(id=product_id).first()
+
+        if data:
+            product_shop_data = data
             product_shop_data['product_id'] = product.id
+
+            query = session.query(ProductShop).filter_by(shop_id=product_shop_data["shop_id"], product_id=product.id)
+            if session.query(query.exists()).scalar():
+                return HTTPConflict()
+
             product_shop = ProductShopSchema().load(product_shop_data, session=session)
             session.add(product_shop)
             session.commit()
