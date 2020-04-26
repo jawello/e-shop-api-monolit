@@ -5,39 +5,14 @@ from aiohttp import web
 import json
 
 from models import Users
+from models.schemas.users_schema import UsersSchema
 
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 
 import logging
 
 log = logging.getLogger(__name__)
 routes = web.RouteTableDef()
-
-
-@routes.get('/users/{login}')
-async def users_get(request: Request) -> Response:
-    try:
-        login = await authorized_userid(request)
-        if not login:
-            return HTTPUnauthorized()
-
-        conn = request.app['db_pool']
-        session_maker = sessionmaker(bind=conn)
-        session = session_maker()
-
-        # TODO: make with marshmallow
-        user = Users.get_user_by_login_sync(session,
-                                            login=request.match_info['login']
-                                            )
-
-        if user:
-            return Response(body=json.dumps(user.to_json()),
-                            headers={'content-type': 'application/json'})
-        else:
-            return HTTPNotFound()
-    except Exception as ex:
-        log.warning(f"Endpoint: /users/login, Method: get. Error:{str(ex)}")
-        return HTTPInternalServerError()
 
 
 @routes.get('/users')
@@ -51,18 +26,48 @@ async def users_get(request: Request) -> Response:
         session_maker = sessionmaker(bind=conn)
         session = session_maker()
 
-        # TODO: make with marshmallow
-        users = session.query(Users)
+        users = session.query(Users).all()
 
-        users_list = []
-        for u in users:
-            users_list.append(u.to_json())
-
-        if users_list:
-            return Response(body=json.dumps(users_list),
-                            headers={'content-type': 'application/json'})
+        params = request.rel_url.query.get('output')
+        if params:
+            output = [x.strip() for x in params.split(',')]
+            users_serialized = UsersSchema(only=output, many=True).dump(users)
         else:
+            users_serialized = UsersSchema(many=True).dump(users)
+
+        return Response(body=json.dumps(users_serialized),
+                        headers={'content-type': 'application/json'})
+
+    except Exception as ex:
+        log.warning(f"Endpoint: /users, Method: get. Error:{str(ex)}")
+        return HTTPInternalServerError()
+
+
+@routes.get('/users/{login}')
+async def users_get(request: Request) -> Response:
+    try:
+        login = await authorized_userid(request)
+        if not login:
+            return HTTPUnauthorized()
+
+        conn = request.app['db_pool']
+        session_maker = sessionmaker(bind=conn)
+        session: Session = session_maker()
+
+        user = session.query(Users).filter_by(login=request.match_info['login']).first()
+
+        if not user:
             return HTTPNotFound()
+
+        params = request.rel_url.query.get('output')
+        if params:
+            output = [x.strip() for x in params.split(',')]
+            user_serialized = UsersSchema(only=output).dump(user)
+        else:
+            user_serialized = UsersSchema().dump(user)
+
+        return Response(body=json.dumps(user_serialized),
+                        headers={'content-type': 'application/json'})
     except Exception as ex:
         log.warning(f"Endpoint: /users/login, Method: get. Error:{str(ex)}")
         return HTTPInternalServerError()
@@ -76,13 +81,11 @@ async def users_post(request: Request) -> Response:
         conn = request.app['db_pool']
         session_maker = sessionmaker(bind=conn)
         session = session_maker()
-        # TODO: make with marshmallow
         if data:
-            user_id = Users.create_user(session,
-                              data.get('name'),
-                              data['login'],
-                              data['password'])
-            return Response(headers={'location': f"/users/{user_id}"})
+            user = UsersSchema().load(data, session=session)
+            session.add(user)
+            session.commit()
+            return Response(headers={'Location': f"/users/{user.id}"})
         else:
             return HTTPBadRequest()
     except Exception as ex:
