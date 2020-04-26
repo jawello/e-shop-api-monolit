@@ -6,12 +6,10 @@ from aiohttp import web
 from models import Basket
 from models.schemas.basket_schema import BasketSchema
 
-from models import Users
-from models import ProductShop
-from models import ProductInBasket
+from models import Users, Shop, Product, ProductShop, ProductInBasket
 
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import sessionmaker, Session
+
 
 import json
 
@@ -51,6 +49,34 @@ async def baskets_get(request: Request) -> Response:
         return HTTPInternalServerError()
 
 
+@routes.get("/baskets/{id}")
+async def products_id_get(request: Request) -> Response:
+    login = await authorized_userid(request)
+    if not login:
+        return HTTPUnauthorized()
+
+    try:
+        conn = request.app['db_pool']
+        session_maker = sessionmaker(bind=conn)
+        session = session_maker()
+
+        basket_id = request.match_info['id']
+        if not basket_id:
+            return HTTPBadRequest()
+
+        basket = session.query(Basket).filter_by(id=basket_id).first()
+
+        params = request.rel_url.query.get('output')
+        if params:
+            output = [x.strip() for x in params.split(',')]
+            products_serialized = BasketSchema(only=output).dump(basket)
+        else:
+            products_serialized = BasketSchema().dump(basket)
+
+        return Response(body=json.dumps(products_serialized), headers={'content-type': 'application/json'})
+    except Exception as ex:
+        log.warning(f"Endpoint: baskets/id, Method: get. Error:{str(ex)}")
+        return HTTPInternalServerError()
 def create_basket_dict(session: Session, user: Users) -> dict:
     result = {}
     baskets = session.query(Basket).filter_by(users=user).filter_by(order=None).all()
