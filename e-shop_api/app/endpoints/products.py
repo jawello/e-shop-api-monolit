@@ -123,7 +123,7 @@ async def products_shop_post(request: Request) -> Response:
             product_shop = ProductShopSchema().load(product_shop_data, session=session)
             session.add(product_shop)
             session.commit()
-            return Response(headers={'location': f"/products/{product.id}"})
+            return Response(headers={'Location': f"/products/{product.id}"})
         else:
             return HTTPBadRequest()
     except Exception as ex:
