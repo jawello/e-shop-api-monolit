@@ -5,6 +5,8 @@ import json
 
 from models.shop import Shop
 from models.schemas.shop_schema import ShopSchema
+from models.product_shop import ProductShop
+from models.schemas.product_shop_schema import ProductShopSchema
 
 from sqlalchemy.orm import sessionmaker
 
@@ -77,5 +79,23 @@ async def shops_post(request: Request) -> Response:
         log.warning(f"Endpoint: /shops, Method: post. Error:{str(ex)}")
         return HTTPInternalServerError()
 
-# TODO: make post method to add product to shop
 
+@routes.get("/shops/{id}/products")
+async def shops_id_products_get(request: Request) -> Response:
+    try:
+        shop_id = request.match_info['id']
+        if not shop_id:
+            return HTTPBadRequest()
+
+        conn = request.app['db_pool']
+        session_maker = sessionmaker(bind=conn)
+        session = session_maker()
+
+        products_shop = session.query(ProductShop).filter_by(shop_id=shop_id).all()
+        products_serialized = ProductShopSchema(many=True, exclude=['id', 'shop_id']).dump(products_shop)
+
+        return Response(body=json.dumps(products_serialized), headers={'content-type': 'application/json'})
+    except Exception as ex:
+        log.warning(f"Endpoint: shops/id/products, Method: get. Error:{str(ex)}")
+        return HTTPInternalServerError()
+# TODO: make post method to add product to shop

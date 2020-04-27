@@ -7,5 +7,4 @@ class BasketSchema(SQLAlchemyAutoSchema):
         model = Basket
         include_fk = True
         load_instance = True
-        include_relationships = True
 

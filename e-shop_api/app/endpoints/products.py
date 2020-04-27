@@ -8,7 +8,7 @@ from models.schemas.product_schema import ProductSchema
 from models.product_shop import ProductShop
 from models.schemas.product_shop_schema import ProductShopSchema
 
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, joinedload
 
 import logging
 
@@ -54,14 +54,13 @@ async def products_id_get(request: Request) -> Response:
         if not product_id:
             return HTTPBadRequest()
 
-        result = session.query(Product).filter_by(id=product_id).first()
-
+        product = session.query(Product).filter_by(id=product_id).first()
         params = request.rel_url.query.get('output')
         if params:
             output = [x.strip() for x in params.split(',')]
-            products_serialized = ProductSchema(only=output).dump(result)
+            products_serialized = ProductSchema(only=output).dump(product)
         else:
-            products_serialized = ProductSchema().dump(result)
+            products_serialized = ProductSchema().dump(product)
 
         return Response(body=json.dumps(products_serialized), headers={'content-type': 'application/json'})
     except Exception as ex:
@@ -97,8 +96,29 @@ async def products_post(request: Request) -> Response:
         return HTTPInternalServerError()
 
 
+@routes.get('/products/{id}/shops')
+async def products_shops_get(request: Request) -> Response:
+    try:
+        conn = request.app['db_pool']
+        session_maker = sessionmaker(bind=conn)
+        session = session_maker()
+
+        product_id = request.match_info['id']
+        if not product_id:
+            return HTTPBadRequest()
+
+        product_shop = session.query(ProductShop).filter_by(product_id=product_id).all()
+
+        products_shops_serialized = ProductShopSchema(many=True, exclude=['id', 'product_id']).dump(product_shop)
+
+        return Response(body=json.dumps(products_shops_serialized), headers={'content-type': 'application/json'})
+    except Exception as ex:
+        log.warning(f"Endpoint: /products/id/shops, Method: get. Error:{str(ex)}")
+        return HTTPInternalServerError()
+
+
 @routes.post('/products/{id}/shops')
-async def products_shop_post(request: Request) -> Response:
+async def products_shops_post(request: Request) -> Response:
     try:
         data = await request.json()
 
@@ -127,6 +147,6 @@ async def products_shop_post(request: Request) -> Response:
         else:
             return HTTPBadRequest()
     except Exception as ex:
-        log.warning(f"Endpoint: /products, Method: post. Error:{str(ex)}")
+        log.warning(f"Endpoint: /products/id/shops, Method: post. Error:{str(ex)}")
         return HTTPInternalServerError()
 

@@ -1,12 +1,13 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.associationproxy import association_proxy
 from models import Base
 
 
 class Shop(Base):
     __tablename__ = 'shop'
     id = sa.Column('id', sa.Integer, primary_key=True)
-    product_shop = relationship("ProductShop", back_populates="shop")
+    products = association_proxy("product_shop", "product")
     basket = relationship("Basket", back_populates="shop", uselist=True)
     name = sa.Column('name', sa.String, nullable=False, unique=True)
     description = sa.Column('description', sa.String)
