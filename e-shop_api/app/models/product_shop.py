@@ -1,6 +1,5 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy.orm.collections import attribute_mapped_collection
 from models import Base
 
 
