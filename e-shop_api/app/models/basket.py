@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.associationproxy import association_proxy
 
 from models import Base
 
@@ -10,7 +11,9 @@ class Basket(Base):
     order = relationship("Order", back_populates="basket", uselist=False)
     shop_id = sa.Column(sa.Integer, sa.ForeignKey("shop.id"))
     shop = relationship("Shop", back_populates="basket", uselist=False)
-    product_in_basket = relationship("ProductInBasket", back_populates="basket")
+
+    product_shop = association_proxy("product_in_basket", "product_shop")
+
     users_id = sa.Column(sa.Integer, sa.ForeignKey("users.id"))
     users = relationship("Users", back_populates="basket", uselist=False)
 
