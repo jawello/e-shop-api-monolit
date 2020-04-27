@@ -1,7 +1,6 @@
 from aiohttp.web import Request, HTTPUnauthorized, HTTPNotFound, HTTPInternalServerError, HTTPBadRequest
 from aiohttp.web_response import Response
 from aiohttp_security import authorized_userid
-from aiohttp import web
 import json
 
 from models import Users
@@ -12,10 +11,8 @@ from sqlalchemy.orm import sessionmaker, Session
 import logging
 
 log = logging.getLogger(__name__)
-routes = web.RouteTableDef()
 
 
-@routes.get('/users')
 async def users_get(request: Request) -> Response:
     try:
         login = await authorized_userid(request)
@@ -43,8 +40,7 @@ async def users_get(request: Request) -> Response:
         return HTTPInternalServerError()
 
 
-@routes.get('/users/{login}')
-async def users_get(request: Request) -> Response:
+async def users_login_get(request: Request) -> Response:
     try:
         login = await authorized_userid(request)
         if not login:
@@ -73,7 +69,6 @@ async def users_get(request: Request) -> Response:
         return HTTPInternalServerError()
 
 
-@routes.post('/users')
 async def users_post(request: Request) -> Response:
     try:
         data = await request.json()

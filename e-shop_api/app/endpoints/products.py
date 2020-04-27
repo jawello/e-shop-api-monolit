@@ -1,6 +1,5 @@
 from aiohttp.web import Request, HTTPInternalServerError, HTTPBadRequest, HTTPConflict
 from aiohttp.web_response import Response
-from aiohttp import web
 import json
 
 from models.product import Product
@@ -8,15 +7,13 @@ from models.schemas.product_schema import ProductSchema
 from models.product_shop import ProductShop
 from models.schemas.product_shop_schema import ProductShopSchema
 
-from sqlalchemy.orm import sessionmaker, joinedload
+from sqlalchemy.orm import sessionmaker
 
 import logging
 
 log = logging.getLogger(__name__)
-routes = web.RouteTableDef()
 
 
-@routes.get("/products")
 async def products_get(request: Request) -> Response:
     try:
         conn = request.app['db_pool']
@@ -43,7 +40,6 @@ async def products_get(request: Request) -> Response:
         return HTTPInternalServerError()
 
 
-@routes.get("/products/{id}")
 async def products_id_get(request: Request) -> Response:
     try:
         conn = request.app['db_pool']
@@ -68,7 +64,6 @@ async def products_id_get(request: Request) -> Response:
         return HTTPInternalServerError()
 
 
-@routes.post('/products')
 async def products_post(request: Request) -> Response:
     try:
         data = await request.json()
@@ -96,7 +91,6 @@ async def products_post(request: Request) -> Response:
         return HTTPInternalServerError()
 
 
-@routes.get('/products/{id}/shops')
 async def products_shops_get(request: Request) -> Response:
     try:
         conn = request.app['db_pool']
@@ -117,8 +111,7 @@ async def products_shops_get(request: Request) -> Response:
         return HTTPInternalServerError()
 
 
-@routes.post('/products/{id}/shops')
-async def products_shops_post(request: Request) -> Response:
+async def products_shops_put(request: Request) -> Response:
     try:
         data = await request.json()
 

@@ -1,6 +1,5 @@
 from aiohttp.web import Request, HTTPInternalServerError, HTTPBadRequest
 from aiohttp.web_response import Response
-from aiohttp import web
 import json
 
 from models.shop import Shop
@@ -13,10 +12,8 @@ from sqlalchemy.orm import sessionmaker
 import logging
 
 log = logging.getLogger(__name__)
-routes = web.RouteTableDef()
 
 
-@routes.get("/shops")
 async def shops_get(request: Request) -> Response:
     try:
         params = request.rel_url.query.get('output')
@@ -36,7 +33,6 @@ async def shops_get(request: Request) -> Response:
         return HTTPInternalServerError()
 
 
-@routes.get("/shops/{id}")
 async def shops_id_get(request: Request) -> Response:
     try:
         shop_id = request.match_info['id']
@@ -60,7 +56,6 @@ async def shops_id_get(request: Request) -> Response:
         return HTTPInternalServerError()
 
 
-@routes.post('/shops')
 async def shops_post(request: Request) -> Response:
     try:
         data = await request.json()
@@ -80,7 +75,6 @@ async def shops_post(request: Request) -> Response:
         return HTTPInternalServerError()
 
 
-@routes.get("/shops/{id}/products")
 async def shops_id_products_get(request: Request) -> Response:
     try:
         shop_id = request.match_info['id']
