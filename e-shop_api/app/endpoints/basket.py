@@ -163,10 +163,15 @@ async def baskets_id_products_put(request: Request) -> Response:
             if quantity > ps.quantity:
                 return HTTPBadRequest()
 
-            product_in_basket = ProductInBasket(product_shop=ps, basket=basket, quantity=quantity)
+            product_in_basket = session.query(ProductInBasket)\
+                .filter_by(product_shop_id=ps.id, basket_id=basket.id).first()
+
+            if not product_in_basket:
+                product_in_basket = ProductInBasket(product_shop=ps, basket=basket, quantity=quantity)
+            else:
+                product_in_basket.quantity = quantity
             session.add(product_in_basket)
-            # TODO: can't update product in basket. Try to change pk of ProductInBasket to complex key: shop_id,
-            #  product_id. Think about change pk for ProductShop
+            
         try:
             session.commit()
         except SQLAlchemyError:
@@ -177,61 +182,3 @@ async def baskets_id_products_put(request: Request) -> Response:
         log.warning(f"Endpoint: /baskets/id/products, Method: put. Error:{str(ex)}")
         return HTTPInternalServerError()
 
-
-def create_basket_dict(session: Session, user: Users) -> dict:
-    result = {}
-    baskets = session.query(Basket).filter_by(users=user).filter_by(order=None).all()
-    for basket in baskets:
-        result[basket.shop.id] = basket
-
-    return result
-
-
-def fill_basket(session: Session, basket_product_dict: dict, products: [], user: Users):
-    result = basket_product_dict
-    for product in products:
-        product_shop = session.query(ProductShop).filter_by(id=product['id']).first()
-        shop = session.query(ProductShop).filter_by(product_shop=product_shop).first()
-        if shop.id not in result:
-            result[shop.id] = Basket(users=user, shop=shop)
-
-        basket = result[shop.id]
-
-        product_in_basket = ProductInBasket(basket=basket, product_shop=product_shop,
-                                            quantity=product['quantity'])
-        session.add(product_in_basket)
-
-
-async def put(request: Request) -> Response:
-    try:
-        login = await authorized_userid(request)
-        if not login:
-            return HTTPUnauthorized()
-        else:
-            conn = request.app['db_pool']
-            session_maker = sessionmaker(bind=conn)
-            session = session_maker()
-            user = Users.get_user_by_login_sync(session,
-                                                login=login
-                                                )
-        if not user:
-            return HTTPNotFound()
-
-        data = await request.json()
-        if data:
-            baskets_shop_dict = create_basket_dict(session, user)
-
-            try:
-                fill_basket(session, baskets_shop_dict, data["products"], user)
-                session.commit()
-            except Exception as ex:
-                session.rollback()
-                log.warning(f"Endpoint: basket, Method: put. Msg:{str(ex)}")
-                return HTTPInternalServerError()
-
-            return Response()
-        else:
-            return HTTPBadRequest()
-    except Exception as ex:
-        log.warning(f"Endpoint: basket, Method: put. Msg:{str(ex)}")
-        return HTTPInternalServerError()
